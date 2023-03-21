@@ -33,11 +33,3 @@ fun TimerView(viewModel: TimerViewModel) {
         )
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StopwatchBLETheme {
-        TimerView(TimerViewModel())
-    }
-}

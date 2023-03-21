@@ -1,4 +1,4 @@
-package com.pikciu.stopwatchble
+package com.pikciu.stopwatch
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -9,15 +9,14 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import com.pikciu.stopwatchble.ui.TimerView
-import com.pikciu.stopwatchble.ui.TimerViewModel
-import com.pikciu.stopwatchble.ui.theme.StopwatchBLETheme
+import com.pikciu.stopwatch.ui.TimerView
+import com.pikciu.stopwatch.ui.TimerViewModel
+import com.pikciu.stopwatch.ui.theme.StopwatchBLETheme
 
 class MainActivity : ComponentActivity() {
 

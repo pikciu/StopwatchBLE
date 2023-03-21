@@ -1,9 +1,9 @@
-package com.pikciu.stopwatchble.ui
+package com.pikciu.stopwatch.ui
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.pikciu.stopwatchble.Stopwatch
+import com.pikciu.stopwatch.Stopwatch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

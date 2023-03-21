@@ -1,4 +1,4 @@
-package com.pikciu.stopwatchble
+package com.pikciu.stopwatch
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter

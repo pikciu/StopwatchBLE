@@ -1,11 +1,9 @@
-package com.pikciu.stopwatchble.ui
+package com.pikciu.stopwatch.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Preview
-import com.pikciu.stopwatchble.ui.theme.StopwatchBLETheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily

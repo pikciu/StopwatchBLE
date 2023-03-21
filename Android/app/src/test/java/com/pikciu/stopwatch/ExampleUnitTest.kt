@@ -1,4 +1,4 @@
-package com.pikciu.stopwatchble
+package com.pikciu.stopwatch
 
 import org.junit.Test
 

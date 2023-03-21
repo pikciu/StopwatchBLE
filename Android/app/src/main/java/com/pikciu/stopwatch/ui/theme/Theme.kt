@@ -1,4 +1,4 @@
-package com.pikciu.stopwatchble.ui.theme
+package com.pikciu.stopwatch.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

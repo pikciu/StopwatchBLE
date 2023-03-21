@@ -1,6 +1,7 @@
 package com.pikciu.stopwatchble.ui
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.pikciu.stopwatchble.Stopwatch
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,8 +11,8 @@ import kotlinx.coroutines.flow.update
 import java.util.*
 import kotlin.concurrent.timer
 
-class TimerViewModel(bluetoothAdapter: BluetoothAdapter): ViewModel() {
-    val stopwatch = Stopwatch(bluetoothAdapter) { timestamp ->
+class TimerViewModel(bluetoothAdapter: BluetoothAdapter, context: Context): ViewModel() {
+    val stopwatch = Stopwatch(bluetoothAdapter, context) { timestamp ->
         updateState(timestamp)
     }
     private var timer: Timer? = null

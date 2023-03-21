@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -21,12 +22,16 @@ import com.pikciu.stopwatchble.ui.theme.StopwatchBLETheme
 class MainActivity : ComponentActivity() {
 
     private val bluetoothAdapter: BluetoothAdapter by lazy { getSystemService(BluetoothManager::class.java).adapter }
-    private val timerViewModel: TimerViewModel by lazy { TimerViewModel(bluetoothAdapter) }
-    private val enableBluetoothRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        timerViewModel.stopwatch.start()
+    private val timerViewModel: TimerViewModel by lazy { TimerViewModel(bluetoothAdapter, this) }
+    private val enableBluetoothRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            timerViewModel.stopwatch.start()
+        }
     }
-    private val bluetoothPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        enableBluetooth()
+    private val bluetoothPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            enableBluetooth()
+        }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,15 +51,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun enableBluetooth() {
-        if (bluetoothAdapter.isEnabled) {
+        if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_SCAN)
+            }
+        } else if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+        } else if (bluetoothAdapter.isEnabled) {
             timerViewModel.stopwatch.start()
-            return
-        }
-        if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+        } else {
             val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             enableBluetoothRequest.launch(enableIntent)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_CONNECT)
         }
     }
 }

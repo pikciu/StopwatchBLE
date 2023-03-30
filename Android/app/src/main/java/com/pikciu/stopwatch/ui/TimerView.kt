@@ -2,6 +2,7 @@ package com.pikciu.stopwatch.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +25,7 @@ fun TimerView(viewModel: TimerViewModel) {
         Text(
             text = time.text,
             textAlign = TextAlign.Center,
-            fontFamily = FontFamily.Monospace,
+            style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
             fontSize = textSize,
             maxLines = 1,
             fontWeight = FontWeight.SemiBold,

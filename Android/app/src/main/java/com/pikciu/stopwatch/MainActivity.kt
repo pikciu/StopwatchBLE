@@ -46,19 +46,25 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        enableBluetooth()
+        checkBluetoothPermissions()
+    }
+
+    private fun checkBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_SCAN)
+            } else if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            } else {
+                enableBluetooth()
+            }
+        } else {
+            enableBluetooth()
+        }
     }
 
     private fun enableBluetooth() {
-        if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_SCAN)
-            }
-        } else if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_CONNECT)
-            }
-        } else if (bluetoothAdapter.isEnabled) {
+        if (bluetoothAdapter.isEnabled) {
             timerViewModel.stopwatch.start()
         } else {
             val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)

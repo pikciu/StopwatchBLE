@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">StopwatchBLE</string>
+    <string name="location_disabled">Lokalizacja wyłączona</string>
+    <string name="settings">Ustawienia</string>
 </resources>

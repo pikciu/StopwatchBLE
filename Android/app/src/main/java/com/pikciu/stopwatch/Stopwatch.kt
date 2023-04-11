@@ -1,5 +1,6 @@
 package com.pikciu.stopwatch
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
@@ -9,6 +10,7 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -20,6 +22,7 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
         const val CHARACTERISTIC_UUID = "e5881cf2-7b51-4dd5-a1e4-3514d2fc3235"
     }
 
+    private var isScanning = false
     private var isConnecting = false
     private val scanner: BluetoothLeScanner by lazy { bluetoothAdapter.bluetoothLeScanner }
 
@@ -27,6 +30,11 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             connect(result)
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            super.onScanFailed(errorCode)
+            Log.d(TAG, "onScanFailed")
         }
     }
 
@@ -38,6 +46,7 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
             val service = gatt.getService(UUID.fromString(SERVICE_UUID)) ?: return
             val characteristic = service.getCharacteristic(UUID.fromString(CHARACTERISTIC_UUID)) ?: return
             gatt.setCharacteristicNotification(characteristic, true)
+            isConnecting = false
         }
 
         @SuppressLint("MissingPermission")
@@ -54,20 +63,43 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
             }
         }
 
+        override fun onServiceChanged(gatt: BluetoothGatt) {
+            super.onServiceChanged(gatt)
+            Log.d(TAG, "onServiceChanged")
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic)
+            Log.d(TAG, "onCharacteristicChanged")
+            handle(characteristic.value)
+        }
+
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
             value: ByteArray
         ) {
             super.onCharacteristicChanged(gatt, characteristic, value)
-            val timestamp = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN).int
+            Log.d(TAG, "onCharacteristicChanged")
+            handle(value)
+        }
+
+        private fun handle(bytes: ByteArray) {
+            val timestamp = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).int
             callback(timestamp)
-            Log.d(TAG, "onCharacteristicChanged $timestamp")
+            Log.d(TAG, "value: $timestamp")
         }
     }
 
-    @SuppressLint("MissingPermission")
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     fun start() {
+        if (isScanning) {
+            return
+        }
+        isScanning = true
         val filter = ScanFilter.Builder()
             .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID)))
             .build()
@@ -85,6 +117,7 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
         }
         val device = result?.device ?: return
         scanner.stopScan(scanCallback)
+        isScanning = false
         device.connectGatt(context, true, gattCallback)
         isConnecting = true
     }

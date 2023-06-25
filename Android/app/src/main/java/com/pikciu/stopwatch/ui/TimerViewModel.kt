@@ -6,10 +6,7 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import com.pikciu.stopwatch.Stopwatch
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.concurrent.timer
 
@@ -21,8 +18,10 @@ class TimerViewModel(bluetoothAdapter: BluetoothAdapter, context: Context): View
     private var state: State = State.Ready
     private val _time = MutableStateFlow(state.time)
     private val _locationError = MutableStateFlow(false)
-    val time: StateFlow<Time> = _time.asStateFlow()
-    val locationError: StateFlow<Boolean> = _locationError.asStateFlow()
+    private val _results = MutableStateFlow(emptyArray<Result>())
+    val time = _time.asStateFlow()
+    val locationError = _locationError.asStateFlow()
+    val results = _results.asStateFlow()
 
     private fun updateState(timestamp: Int) {
         state = state.next(timestamp)
@@ -36,6 +35,10 @@ class TimerViewModel(bluetoothAdapter: BluetoothAdapter, context: Context): View
             }
         } else {
             timer?.cancel()
+        }
+
+        if (state is State.Stop) {
+            _results.update { it + Result(number = it.count() + 1, time = state.time) }
         }
     }
 
@@ -54,6 +57,14 @@ data class Time(
 ) {
     val text: String
         get() = String.format(Locale.US, "%.2f", seconds)
+}
+
+data class Result(
+    val number: Int,
+    val time: Time
+) {
+    val text: String
+        get() = "$number: ${time.text}"
 }
 
 sealed class State {

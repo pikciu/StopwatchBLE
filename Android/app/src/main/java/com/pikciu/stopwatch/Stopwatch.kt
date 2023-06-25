@@ -1,6 +1,5 @@
 package com.pikciu.stopwatch
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
@@ -10,7 +9,6 @@ import android.bluetooth.le.*
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import androidx.annotation.RequiresPermission
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -70,15 +68,6 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
 
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic
-        ) {
-            super.onCharacteristicChanged(gatt, characteristic)
-            Log.d(TAG, "onCharacteristicChanged")
-            handle(characteristic.value)
-        }
-
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
             value: ByteArray
         ) {
@@ -94,7 +83,7 @@ class Stopwatch(private val bluetoothAdapter: BluetoothAdapter, private val cont
         }
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    @SuppressLint("MissingPermission")
     fun start() {
         if (isScanning) {
             return

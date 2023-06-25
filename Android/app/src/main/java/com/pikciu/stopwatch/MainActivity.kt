@@ -1,7 +1,6 @@
 package com.pikciu.stopwatch
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Intent
@@ -9,17 +8,13 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
 import com.pikciu.stopwatch.ui.TimerView
 import com.pikciu.stopwatch.ui.TimerViewModel
 import com.pikciu.stopwatch.ui.theme.StopwatchBLETheme
@@ -64,12 +59,14 @@ class MainActivity : ComponentActivity() {
             } else {
                 enableBluetooth()
             }
-        } else if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            bluetoothPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        } else if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            bluetoothPermissionRequest.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
         } else {
-            enableBluetooth()
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH)
+            } else if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                bluetoothPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            } else {
+                enableBluetooth()
+            }
         }
     }
 
@@ -85,10 +82,8 @@ class MainActivity : ComponentActivity() {
     private fun startStopwatch() {
         if (!checkLocation()) {
             timerViewModel.showLocationAlert()
-        } else if(checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
-            timerViewModel.stopwatch.start()
         } else {
-            Log.e("MainActivity", "missing BLUETOOTH_SCAN permission")
+            timerViewModel.stopwatch.start()
         }
     }
 

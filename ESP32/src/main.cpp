@@ -7,8 +7,9 @@
 #define SERVICE_UUID "a129eaa4-28f6-4a61-a2b7-cb150dfcb92e"
 #define CHARACTERISTIC_UUID "e5881cf2-7b51-4dd5-a1e4-3514d2fc3235"
 
-#define RELEASE_BUTTON_PIN 15
-#define PRESS_BUTTON_PIN 4
+#define RELEASE_BUTTON_PIN 14
+#define PRESS_BUTTON_PIN 33
+#define FAKE_GND_PIN 26
 
 InputDebouncer releaseButton(RELEASE_BUTTON_PIN, 50, Rising);
 InputDebouncer pressButton(PRESS_BUTTON_PIN, 50, Falling);
@@ -27,6 +28,7 @@ void notify(unsigned long time) {
 }
 
 void setup() {
+    pinMode(FAKE_GND_PIN, OUTPUT);
     Serial.begin(9600);
     pinMode(RELEASE_BUTTON_PIN, INPUT_PULLUP);
     pinMode(PRESS_BUTTON_PIN, INPUT_PULLUP);
@@ -46,6 +48,8 @@ void setup() {
     BLEAdvertising *advertising = BLEDevice::getAdvertising();
     advertising->addServiceUUID(SERVICE_UUID);
     server->getAdvertising()->start();
+    Serial.println("ready");
+    digitalWrite(FAKE_GND_PIN, LOW);
 }
 
 void loop() {
